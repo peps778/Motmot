@@ -55,7 +55,7 @@ const PORTRAIT = {
 };
 
 // volume must be 0.0 - 1.0
-const AUDIO_VOLUME = 0.12;
+const AUDIO_VOLUME = 1;
 
 /***********************
  * Helpers
