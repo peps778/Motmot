@@ -51,7 +51,14 @@ const FOR_YOU =
 
 const PORTRAIT = {
   imageUrl: "images/portrait.jpg",
-  lyrics: "HTML Portrait Text — (Paste lyrics here later) ",
+  lyrics:
+  "What if we rewrote the sky tonight? " +
+  "What if the stars aligned for us? " +
+  "No walls, no distance, no fear — just you and me choosing love. " +
+  "If fate says no, we’ll say yes. " +
+  "If the world says stop, we’ll still move forward. " +
+  "Because when I look at you, I don’t see limits — I see destiny. ",
+
 };
 
 // volume must be 0.0 - 1.0
