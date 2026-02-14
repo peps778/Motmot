@@ -1,10 +1,15 @@
+// main.js
+
 /***********************
  * Data (edit these)
  ***********************/
 const IMAGES = [
-  "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=1400&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1520975958225-9f17a48e20b1?w=1400&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1511988617509-a57c8a288659?w=1400&auto=format&fit=crop&q=80",
+  "images/first_image.jpg",
+  "images/second_image.jpg",
+  "images/third_image.jpg",
+  "images/fourth_image.jpg",
+  "images/fifth_image.jpg",
+  "images/last_image.jpg",
 ];
 
 const MUSIC_PAGES = [
@@ -45,12 +50,11 @@ const FOR_YOU =
   "Thank you for staying, for choosing, for growing with me. In the quiet days and the heavy ones too, I still want you—again and again.";
 
 const PORTRAIT = {
-  imageUrl:
-    "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=1400&auto=format&fit=crop&q=80",
-  // You left this blank, so placeholder stays:
+  imageUrl: "images/portrait.jpg",
   lyrics: "HTML Portrait Text — (Paste lyrics here later) ",
 };
 
+// volume must be 0.0 - 1.0
 const AUDIO_VOLUME = 0.12;
 
 /***********************
@@ -294,16 +298,19 @@ portraitRegen.addEventListener("click", renderPortrait);
 renderPortrait();
 
 /***********************
- * Background music
+ * Background music (autoplay-on-load + keep button functions)
  ***********************/
 const bgAudio = document.getElementById("bgAudio");
 const audioBtn = document.getElementById("audioBtn");
-let audioEnabled = false;
 
-function fadeToVolume(target = AUDIO_VOLUME, ms = 650) {
+let audioEnabled = false;
+let userInteractionBound = false;
+
+function fadeToVolume(target = AUDIO_VOLUME, ms = 900) {
   if (!bgAudio) return;
+
   const start = bgAudio.volume || 0;
-  const steps = 20;
+  const steps = 24;
   let i = 0;
   const tick = ms / steps;
 
@@ -317,16 +324,27 @@ function fadeToVolume(target = AUDIO_VOLUME, ms = 650) {
 
 async function tryStartAudio() {
   if (!bgAudio) return false;
+
   try {
     bgAudio.volume = 0;
     await bgAudio.play();
     fadeToVolume(AUDIO_VOLUME);
     audioEnabled = true;
-    audioBtn.textContent = "♫ Music On";
+    if (audioBtn) audioBtn.textContent = "♫ Music On";
     return true;
   } catch {
     audioEnabled = false;
-    audioBtn.textContent = "♫ Enable Music";
+    if (audioBtn) audioBtn.textContent = "♫ Enable Music";
+
+    if (!userInteractionBound) {
+      userInteractionBound = true;
+      const startOnFirstInteraction = async () => {
+        if (audioEnabled) return;
+        await tryStartAudio();
+      };
+      document.addEventListener("click", startOnFirstInteraction, { once: true });
+      document.addEventListener("touchstart", startOnFirstInteraction, { once: true });
+    }
     return false;
   }
 }
@@ -336,15 +354,23 @@ function stopAudio() {
   bgAudio.pause();
   bgAudio.currentTime = 0;
   audioEnabled = false;
-  audioBtn.textContent = "♫ Enable Music";
+  if (audioBtn) audioBtn.textContent = "♫ Enable Music";
 }
 
-audioBtn.addEventListener("click", async () => {
-  if (!bgAudio) return;
-  if (audioEnabled) return stopAudio();
-  await tryStartAudio();
-});
+if (audioBtn) {
+  audioBtn.addEventListener("click", async () => {
+    if (!bgAudio) return;
 
+    if (audioEnabled) {
+      stopAudio();
+      return;
+    }
+
+    await tryStartAudio();
+  });
+}
+
+// Auto-try on load
 window.addEventListener("load", () => {
   tryStartAudio();
 });
